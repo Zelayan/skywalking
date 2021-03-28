@@ -56,6 +56,10 @@ public enum ServiceManager {
         });
     }
 
+    /**
+     *
+     * @return
+     */
     private Map<Class, BootService> loadAllServices() {
         Map<Class, BootService> bootedServices = new LinkedHashMap<>();
         List<BootService> allServices = new LinkedList<>();

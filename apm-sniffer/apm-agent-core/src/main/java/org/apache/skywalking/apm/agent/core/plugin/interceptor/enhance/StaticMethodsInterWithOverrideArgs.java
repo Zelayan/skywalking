@@ -46,7 +46,7 @@ public class StaticMethodsInterWithOverrideArgs {
      *
      * @param staticMethodsAroundInterceptorClassName class full name.
      */
-    public StaticMethodsInterWithOverrideArgs(String staticMethodsAroundInterceptorClassName) {
+    public   StaticMethodsInterWithOverrideArgs(String staticMethodsAroundInterceptorClassName) {
         this.staticMethodsAroundInterceptorClassName = staticMethodsAroundInterceptorClassName;
     }
 

@@ -42,6 +42,7 @@ public class PluginBootstrap {
         AgentClassLoader.initDefaultLoader();
 
         PluginResourcesResolver resolver = new PluginResourcesResolver();
+        // 去解析 skywalking-plugin.def中要增强的类
         List<URL> resources = resolver.getResources();
 
         if (resources == null || resources.size() == 0) {
@@ -56,7 +57,7 @@ public class PluginBootstrap {
                 LOGGER.error(t, "plugin file [{}] init failure.", pluginUrl);
             }
         }
-
+        // 插件
         List<PluginDefine> pluginClassList = PluginCfg.INSTANCE.getPluginClassList();
 
         List<AbstractClassEnhancePluginDefine> plugins = new ArrayList<AbstractClassEnhancePluginDefine>();
@@ -70,7 +71,7 @@ public class PluginBootstrap {
                 LOGGER.error(t, "load plugin [{}] failure.", pluginDefine.getDefineClass());
             }
         }
-
+        // 插件实例
         plugins.addAll(DynamicPluginLoader.INSTANCE.load(AgentClassLoader.getDefault()));
 
         return plugins;

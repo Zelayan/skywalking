@@ -196,6 +196,7 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
      */
     private DynamicType.Builder<?> enhanceClass(TypeDescription typeDescription, DynamicType.Builder<?> newClassBuilder,
         ClassLoader classLoader) throws PluginException {
+        // 获取所有静态方法拦截点
         StaticMethodsInterceptPoint[] staticMethodsInterceptPoints = getStaticMethodsInterceptPoints();
         String enhanceOriginClassName = typeDescription.getTypeName();
         if (staticMethodsInterceptPoints == null || staticMethodsInterceptPoints.length == 0) {
@@ -203,12 +204,13 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
         }
 
         for (StaticMethodsInterceptPoint staticMethodsInterceptPoint : staticMethodsInterceptPoints) {
+            // 拦截器
             String interceptor = staticMethodsInterceptPoint.getMethodsInterceptor();
             if (StringUtil.isEmpty(interceptor)) {
                 throw new EnhanceException("no StaticMethodsAroundInterceptor define to enhance class " + enhanceOriginClassName);
             }
 
-            if (staticMethodsInterceptPoint.isOverrideArgs()) {
+            if (staticMethodsInterceptPoint.isOverrideArgs()) { // 修改原方法入参
                 if (isBootstrapInstrumentation()) {
                     newClassBuilder = newClassBuilder.method(isStatic().and(staticMethodsInterceptPoint.getMethodsMatcher()))
                                                      .intercept(MethodDelegation.withDefaultConfiguration()
@@ -217,10 +219,10 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
                 } else {
                     newClassBuilder = newClassBuilder.method(isStatic().and(staticMethodsInterceptPoint.getMethodsMatcher()))
                                                      .intercept(MethodDelegation.withDefaultConfiguration()
-                                                                                .withBinders(Morph.Binder.install(OverrideCallable.class))
+                                                                                .withBinders(Morph.Binder.install(OverrideCallable.class)) // OverrideCallable代表不修改原方法入参情况下CAllable原方法的调用
                                                                                 .to(new StaticMethodsInterWithOverrideArgs(interceptor)));
                 }
-            } else {
+            } else { // 不修改原方法入参
                 if (isBootstrapInstrumentation()) {
                     newClassBuilder = newClassBuilder.method(isStatic().and(staticMethodsInterceptPoint.getMethodsMatcher()))
                                                      .intercept(MethodDelegation.withDefaultConfiguration()

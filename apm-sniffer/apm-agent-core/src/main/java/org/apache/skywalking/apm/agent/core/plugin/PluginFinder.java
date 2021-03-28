@@ -46,6 +46,8 @@ public class PluginFinder {
 
     public PluginFinder(List<AbstractClassEnhancePluginDefine> plugins) {
         for (AbstractClassEnhancePluginDefine plugin : plugins) {
+            // enhanceClass要改哪个插件的哪个方法的字节码
+            // 进行分类
             ClassMatch match = plugin.enhanceClass();
 
             if (match == null) {
@@ -70,9 +72,16 @@ public class PluginFinder {
         }
     }
 
+    /**
+     * 找到给定的一个类所可以使用的全部插件
+     * 分别从 类名匹配和辅助条件匹配两类插件中去寻找
+     * @param typeDescription
+     * @return
+     */
+    // TypeDescription是对一种类型的完整描述，其中包含了这个类的全类名
     public List<AbstractClassEnhancePluginDefine> find(TypeDescription typeDescription) {
         List<AbstractClassEnhancePluginDefine> matchedPlugins = new LinkedList<AbstractClassEnhancePluginDefine>();
-        String typeName = typeDescription.getTypeName();
+        String typeName = typeDescription.getTypeName(); // 全类名
         if (nameMatchDefine.containsKey(typeName)) {
             matchedPlugins.addAll(nameMatchDefine.get(typeName));
         }
@@ -87,6 +96,7 @@ public class PluginFinder {
         return matchedPlugins;
     }
 
+    // 构造要增强的类集合ElementMatcher
     public ElementMatcher<? super TypeDescription> buildMatch() {
         ElementMatcher.Junction judge = new AbstractJunction<NamedElement>() {
             @Override

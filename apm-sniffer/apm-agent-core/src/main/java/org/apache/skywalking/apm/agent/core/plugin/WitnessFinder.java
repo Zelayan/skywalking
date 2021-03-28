@@ -30,6 +30,7 @@ import java.util.Map;
 public enum WitnessFinder {
     INSTANCE;
 
+    // 所有被key所表示是的ClassLoader加载的类型都在这个池子里
     private final Map<ClassLoader, TypePool> poolMap = new HashMap<ClassLoader, TypePool>();
 
     /**

@@ -52,7 +52,9 @@ public abstract class AbstractClassEnhancePluginDefine {
      */
     public DynamicType.Builder<?> define(TypeDescription typeDescription, DynamicType.Builder<?> builder,
         ClassLoader classLoader, EnhanceContext context) throws PluginException {
+
         String interceptorDefineClassName = this.getClass().getName();
+        // 拿到被拦截这个类的全类名
         String transformClassName = typeDescription.getTypeName();
         if (StringUtil.isEmpty(transformClassName)) {
             LOGGER.warn("classname of being intercepted is not defined by {}.", interceptorDefineClassName);

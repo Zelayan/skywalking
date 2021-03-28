@@ -64,6 +64,7 @@ public class SkyWalkingAgent {
     public static void premain(String agentArgs, Instrumentation instrumentation) throws PluginException {
         final PluginFinder pluginFinder;
         try {
+            // -javaagent:/path/agen.jar= k1=v1...
             SnifferConfigInitializer.initializeCoreConfig(agentArgs);
         } catch (Exception e) {
             // try to resolve a new logger, and use the new logger to write the error log here
@@ -88,6 +89,7 @@ public class SkyWalkingAgent {
         final ByteBuddy byteBuddy = new ByteBuddy().with(TypeValidation.of(Config.Agent.IS_OPEN_DEBUGGING_CLASS));
 
         AgentBuilder agentBuilder = new AgentBuilder.Default(byteBuddy).ignore(
+                // 下面是不增强的类
                 nameStartsWith("net.bytebuddy.")
                         .or(nameStartsWith("org.slf4j."))
                         .or(nameStartsWith("org.groovy."))
@@ -96,7 +98,7 @@ public class SkyWalkingAgent {
                         .or(nameContains(".reflectasm."))
                         .or(nameStartsWith("sun.reflect"))
                         .or(allSkyWalkingAgentExcludeToolkit())
-                        .or(ElementMatchers.isSynthetic()));
+                        .or(ElementMatchers.isSynthetic() ));
 
         JDK9ModuleExporter.EdgeClasses edgeClasses = new JDK9ModuleExporter.EdgeClasses();
         try {
@@ -122,14 +124,18 @@ public class SkyWalkingAgent {
             }
         }
 
-        agentBuilder.type(pluginFinder.buildMatch())
-                    .transform(new Transformer(pluginFinder))
+        agentBuilder.type(pluginFinder.buildMatch()) // 要增强的类
+                    .transform(new Transformer(pluginFinder)) //
                     .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                     .with(new RedefinitionListener())
                     .with(new Listener())
                     .installOn(instrumentation);
 
         try {
+            // 插件架构
+            // agent-core 是内核
+            // 服务就是各自插件。通过core来进行管理
+            // maven 就是插件架构
             ServiceManager.INSTANCE.boot();
         } catch (Exception e) {
             LOGGER.error(e, "Skywalking agent boot failure.");
@@ -151,6 +157,7 @@ public class SkyWalkingAgent {
                                                 final TypeDescription typeDescription,
                                                 final ClassLoader classLoader,
                                                 final JavaModule module) {
+            // 拿到所有可以应用到当前被拦截这个类的插件
             List<AbstractClassEnhancePluginDefine> pluginDefines = pluginFinder.find(typeDescription);
             if (pluginDefines.size() > 0) {
                 DynamicType.Builder<?> newBuilder = builder;
@@ -159,6 +166,7 @@ public class SkyWalkingAgent {
                     DynamicType.Builder<?> possibleNewBuilder = define.define(
                             typeDescription, newBuilder, classLoader, context);
                     if (possibleNewBuilder != null) {
+                        // 后一个插件是基于前一个插件已经进行修改的字节码再进行修改
                         newBuilder = possibleNewBuilder;
                     }
                 }

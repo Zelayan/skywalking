@@ -49,6 +49,7 @@ public class AgentClassLoader extends ClassLoader {
     static {
         /*
          * Try to solve the classloader dead lock. See https://github.com/apache/skywalking/pull/2016
+         *  并行的加载classLoader
          */
         registerAsParallelCapable();
     }
