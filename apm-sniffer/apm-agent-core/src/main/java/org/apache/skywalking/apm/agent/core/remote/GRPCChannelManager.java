@@ -43,15 +43,22 @@ import org.apache.skywalking.apm.util.RunnableWithExceptionProtection;
 
 import static org.apache.skywalking.apm.agent.core.conf.Config.Collector.IS_RESOLVE_DNS_PERIODICALLY;
 
+/**
+ * 创建和维护与OAP的grpc连接
+ */
 @DefaultImplementor
 public class GRPCChannelManager implements BootService, Runnable {
     private static final ILog LOGGER = LogManager.getLogger(GRPCChannelManager.class);
 
     private volatile GRPCChannel managedChannel = null;
+    // 定时
     private volatile ScheduledFuture<?> connectCheckFuture;
     private volatile boolean reconnect = true;
     private final Random random = new Random();
+    // 监听器列表
     private final List<GRPCChannelListener> listeners = Collections.synchronizedList(new LinkedList<>());
+
+    // 确定连接要联机哪个OAP实例
     private volatile List<String> grpcServers;
     private volatile int selectedIdx = -1;
     private volatile int reconnectCount = 0;
@@ -69,6 +76,7 @@ public class GRPCChannelManager implements BootService, Runnable {
             return;
         }
         grpcServers = Arrays.asList(Config.Collector.BACKEND_SERVICE.split(","));
+        // 定时任务
         connectCheckFuture = Executors.newSingleThreadScheduledExecutor(
             new DefaultNamedThreadFactory("GRPCChannelManager")
         ).scheduleAtFixedRate(
@@ -95,6 +103,7 @@ public class GRPCChannelManager implements BootService, Runnable {
         LOGGER.debug("Selected collector grpc service shutdown.");
     }
 
+    // 每隔30秒去检测一下OAP状态，如果需要重新连接 就连接一下 告诉所有的监听器
     @Override
     public void run() {
         LOGGER.debug("Selected collector grpc service running, reconnect:{}.", reconnect);

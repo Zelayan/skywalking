@@ -31,6 +31,7 @@ import org.apache.skywalking.apm.agent.core.conf.Constants;
 
 /**
  * Detect the `/ca` folder in agent package, if `ca.crt` exists, start TLS (no mutual auth).
+ * SSL 传输
  */
 public class TLSChannelBuilder implements ChannelBuilder<NettyChannelBuilder> {
     private static String CA_FILE_NAME = "ca" + Constants.PATH_SEPARATOR + "ca.crt";

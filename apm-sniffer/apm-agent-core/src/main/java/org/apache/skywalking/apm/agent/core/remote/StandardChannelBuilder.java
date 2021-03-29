@@ -21,6 +21,9 @@ package org.apache.skywalking.apm.agent.core.remote;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.internal.DnsNameResolverProvider;
 
+/*
+ 明文传输
+ */
 public class StandardChannelBuilder implements ChannelBuilder {
     private final static int MAX_INBOUND_MESSAGE_SIZE = 1024 * 1024 * 50;
 

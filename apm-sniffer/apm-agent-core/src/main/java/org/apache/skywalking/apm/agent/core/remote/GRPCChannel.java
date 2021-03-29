@@ -29,6 +29,7 @@ import java.util.List;
 public class GRPCChannel {
     /**
      * origin channel
+     *  TCP
      */
     private final ManagedChannel originChannel;
     private final Channel channelWithDecorators;
@@ -44,6 +45,7 @@ public class GRPCChannel {
         this.originChannel = channelBuilder.build();
 
         Channel channel = originChannel;
+        // 装饰channel
         for (ChannelDecorator decorator : decorators) {
             channel = decorator.build(channel);
         }

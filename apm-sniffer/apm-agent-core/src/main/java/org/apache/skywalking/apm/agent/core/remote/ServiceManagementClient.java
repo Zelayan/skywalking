@@ -49,6 +49,7 @@ public class ServiceManagementClient implements BootService, Runnable, GRPCChann
     private static List<KeyStringValuePair> SERVICE_INSTANCE_PROPERTIES;
 
     private volatile GRPCChannelStatus status = GRPCChannelStatus.DISCONNECT;
+    // stub
     private volatile ManagementServiceGrpc.ManagementServiceBlockingStub managementServiceBlockingStub;
     private volatile ScheduledFuture<?> heartbeatFuture;
     private volatile AtomicInteger sendPropertiesCounter = new AtomicInteger(0);

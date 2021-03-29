@@ -40,7 +40,7 @@ public class AuthenticationDecorator implements ChannelDecorator {
         if (StringUtil.isEmpty(Config.Agent.AUTHENTICATION)) {
             return channel;
         }
-
+        // 请求头添加token
         return ClientInterceptors.intercept(channel, new ClientInterceptor() {
             @Override
             public <REQ, RESP> ClientCall<REQ, RESP> interceptCall(MethodDescriptor<REQ, RESP> method,
